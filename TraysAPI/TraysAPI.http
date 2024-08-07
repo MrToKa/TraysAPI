@@ -1,0 +1,9 @@
+﻿@TraysAPI_HostAddress = https://localhost:7141
+
+GET {{TraysAPI_HostAddress}}/api/tray/C107
+
+###
+
+GET {{TraysAPI_HostAddress}}/api/tray/names
+
+###
