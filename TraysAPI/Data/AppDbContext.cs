@@ -12,7 +12,7 @@ namespace TraysAPI.Data
         private string BuildConnectionString()
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile(@"C:\Users\todor.chankov\source\repos\TraysAPI\TraysAPI\appsettings.json")
+                .AddJsonFile(@"C:\Users\todor.chankov\source\repos\MrToKa\TraysAPI\TraysAPI\appsettings.json")
                 .Build();
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");

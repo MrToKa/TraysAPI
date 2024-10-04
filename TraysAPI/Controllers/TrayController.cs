@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TraysAPI.Data;
+using TraysAPI.Data.Models;
 
 namespace CableManagementApi.Controllers
 {
@@ -18,20 +19,36 @@ namespace CableManagementApi.Controllers
         [HttpGet("{trayName}")]
         public async Task<IActionResult> GetTrayInfo(string trayName)
         {
+            var cables = await _context.Cables
+                .Include(c => c.CableType)
+                .ToListAsync();  // Fetch all cables into memory
+
+            // Apply the filter with StringComparison after fetching data
+            var filteredCables = cables
+                .Where(c => c.Routing.Split('/')
+                    .Any(segment => string.Equals(segment, trayName, StringComparison.OrdinalIgnoreCase)))  // Case-insensitive comparison
+                .ToList();
+
             var tray = await _context.Trays
                 .Where(t => t.Name == trayName)
                 .Select(t => new
                 {
                     t.Width,
                     Height = t.Height - 15,
-                    Cables = _context.Cables
-                        .Include(c => c.CableType)
-                        .Where(c => c.Routing.Contains($"/{trayName}"))
+                    Cables = filteredCables
                         .Select(c => new
                         {
                             CableInfo = $"{c.CableName} => {c.CableType.Type} => {c.CableType.Diameter} => {c.CableType.Weight} => {c.CableInformation}"
                         })
                         .ToList()
+                    //Cables = _context.Cables
+                    //    .Include(c => c.CableType)
+                    //    .Where(c => c.Routing.Contains(trayName))
+                    //    .Select(c => new
+                    //    {
+                    //        CableInfo = $"{c.CableName} => {c.CableType.Type} => {c.CableType.Diameter} => {c.CableType.Weight} => {c.CableInformation}"
+                    //    })
+                    //    .ToList()
                 })
                 .FirstOrDefaultAsync();
 
